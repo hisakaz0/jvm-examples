@@ -3,9 +3,8 @@
  */
 package bson.cross.json
 
-import java.io.*
 import com.fasterxml.jackson.databind.*
-import de.undercouch.bson4jackson.*
+import de.undercouch.bson4jackson.BsonFactory
 
 class App {
     val greeting: String
@@ -17,20 +16,29 @@ class App {
 fun main(args: Array<String>) {
     println(App().greeting)
 
-    exampleBsonCrossJson()
+    examples()
 }
 
 
-fun exampleBsonCrossJson() {
-
+fun examples() {
     val m = mapOf("hello" to "world")
+    printAsBson(m)
+    printAsJson(m)
+}
+
+fun printAsBson(m: Map<String, String>) {
     val bsonMapper = ObjectMapper(BsonFactory())
+    val bytes = bsonMapper.writeValueAsBytes(m)
 
-    bsonMapper.writeValue(System.out, m)
+    val formatter = { index: Int, byte: Byte ->
+        "0x%02x 0x%02x".format(index, byte)
+    }
+    bytes.forEachIndexed { index, byte -> println(formatter(index, byte))}
+}
 
+fun printAsJson(m: Map<String, String>) {
     val jsonMapper = ObjectMapper()
     jsonMapper.writeValue(System.out, m)
 }
-
 
 
